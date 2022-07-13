@@ -1,5 +1,6 @@
 import amqp from "amqplib";
 import dotenv from "dotenv";
+import { TransactionHandler } from "./transactionsHandler";
 dotenv.config();
 
 export class ConsumerService {
@@ -13,15 +14,16 @@ export class ConsumerService {
             await channel.assertQueue(queueName, { durable: true });
 
             channel.consume(queueName, async (message: any) => {
-                channel.ack(message);
                 const transactionData = JSON.parse(message.content.toString());
-                console.log('Billing consumer serice receieved::: ', transactionData);
-                // await TransactionService.updateTransactionStatus(messageData);
+                console.log('Billing consumer service receieved Completed Txn::: ', transactionData);
+                await TransactionHandler.updateCompletedTransaction(transactionData);
+                // channel.ack(message);
 
-            })
+            }, { noAck: true }
+            )
 
         } catch (error) {
-            console.error(error);
+            console.error("Error in billing service consumer class:: ", error);
         }
     }
 
