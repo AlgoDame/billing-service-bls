@@ -21,13 +21,20 @@ app.use("/v1/api",
 
 );
 
+console.log("Waiting to connect...")
+setTimeout(() => {
+    console.log("Connecting to db...")
+    dbConnection().then(connection => console.log("::: 🚀Connected to Database :::")).catch(error => console.log("Billing startup error:", error));
+    app.listen(PORT, () =>
+        console.log(`🚀 REST API server ready at ⭐️: http://localhost:${PORT}`)
+    );
+    initSchemas();
+    ConsumerService.receiveCompletedTransaction();
 
-dbConnection().then(connection => console.log("::: 🚀Connected to Database :::"));
+}, 60 * 1000)
 
 
-app.listen(PORT, () =>
-    console.log(`🚀 REST API server ready at ⭐️: http://localhost:${PORT}`)
-);
 
-initSchemas();
-ConsumerService.receiveCompletedTransaction();
+
+
+
